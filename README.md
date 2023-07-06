@@ -96,7 +96,7 @@ Error: Kubernetes cluster unreachable: the server has asked for the client to pr
    ```
 To prevent that, we can specify the role name when we pulling the K8 config file. This is a hardcoded way.
 We need to find a better way: maybe variables or add this role to the AWS IAM user we are using here.
-Example: `aws eks update-kubeconfig --region $(awsEKSRegion) --name ${{ parameters.awsEKSClusterName }} --role-arn "arn:aws:iam::539590419140:role/hans.eks-access.role"`
+Example: aws eks update-kubeconfig --region $(awsEKSRegion) --name ${{ parameters.awsEKSClusterName }} --role-arn "arn:aws:iam::539590419140:role/hans.eks-access.role"
         
 ## Pipeline template parameters
 ### Input parameters
