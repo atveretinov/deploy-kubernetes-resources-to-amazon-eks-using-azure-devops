@@ -89,10 +89,10 @@ This is because of this setting in the input "failOnStandardError: true". We nee
    Example:
    ```
    kubectl cluster-info
-E0705 05:16:55.329565    2075 memcache.go:265] couldn't get current server API group list: the server has asked for the client to provide credentials
-error: You must be logged in to the server (the server has asked for the client to provide credentials)
+    E0705 05:16:55.329565    2075 memcache.go:265] couldn't get current server API group list: the server has asked for the client to provide credentials
+    error: You must be logged in to the server (the server has asked for the client to provide credentials)
 
-Error: Kubernetes cluster unreachable: the server has asked for the client to provide credentials
+    Error: Kubernetes cluster unreachable: the server has asked for the client to provide credentials
    ```
 To prevent that, we can specify the role name when we pulling the K8 config file. This is a hardcoded way.
 We need to find a better way: maybe variables or add this role to the AWS IAM user we are using here.
