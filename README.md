@@ -76,6 +76,28 @@ To use the pipeline template, follow this procedure:
     * Click on the Run pipeline button
     * Click on the Run button
 
+## Issues during the run:
+1. Sometimes the run step is successfull, no specific error messages, but the whole pipeline is failing.
+  Example:
+```
+Login Succeeded
+##[error]Error: The process '/usr/bin/bash' failed because one or more lines were written to the STDERR stream
+```
+This is because of this setting in the input "failOnStandardError: true". We need to set failOnStandardError to false to make it working.
+
+2. Sometimes this some steps cannot pickup a valid role or credentials, so we have a permissions denied response from the AWS EKS.
+   Example:
+   ```
+   kubectl cluster-info
+E0705 05:16:55.329565    2075 memcache.go:265] couldn't get current server API group list: the server has asked for the client to provide credentials
+error: You must be logged in to the server (the server has asked for the client to provide credentials)
+
+Error: Kubernetes cluster unreachable: the server has asked for the client to provide credentials
+   ```
+To prevent that, we can specify the role name when we pulling the K8 config file. This is a hardcoded way.
+We need to find a better way: maybe variables or add this role to the AWS IAM user we are using here.
+Example: `aws eks update-kubeconfig --region $(awsEKSRegion) --name ${{ parameters.awsEKSClusterName }} --role-arn "arn:aws:iam::539590419140:role/hans.eks-access.role"`
+        
 ## Pipeline template parameters
 ### Input parameters
 
