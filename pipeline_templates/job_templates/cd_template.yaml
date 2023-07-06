@@ -13,6 +13,9 @@ jobs:
         inputs:
             awsCredentials: ${{ parameters.serviceConnectionName }}
             regionName: ${{ parameters.awsRegion }}
+            
+            # Sometimes the step is successfull, but the whole pipeline is failing. This is because
+            # of this true. We need to set failOnStandardError to false to make it working.
             failOnStandardError: true
             scriptType: 'inline'
             inlineScript: |
@@ -39,16 +42,54 @@ jobs:
             inlineScript: |
                 # # Confirm caller identity
                
-                # echo 'Using identity'
+                # echo 'Using identity' - show who is accessing aws
                 # aws sts get-caller-identity
                 
                 # Pull Helm Chart
                 echo "Pulling helm chart from $(repositoryURI)"
                 helm pull oci://$(repositoryURI) --version $(helmChartVersion)
 
-                # Get Kubeconfig
+                # Get Kubeconfig from the aws environment and put into the local kube config file
                 echo 'Connect to Amazon EKS cluster'
                 aws eks update-kubeconfig --region $(awsEKSRegion) --name ${{ parameters.awsEKSClusterName }}
+
+                # INFO: Sometimes this file cannot pickup a valid role or credentials, so we have a permissions denied response from the AWS EKS
+                # To prevent that, we can specify the role name. This is a hardcoded way. Need to find better way: maybe variables or 
+                # add this role to the user we are using here.
+                # aws eks update-kubeconfig --region $(awsEKSRegion) --name ${{ parameters.awsEKSClusterName }} --role-arn "arn:aws:iam::539590419140:role/hans.eks-access.role"
+                
+                # Sasha: remove this log ==========================
+                # echo ============================================================
+                # cat /home/vsts/.kube/config
+                # echo ============================================================
+                # echo "kubectl config current-context"
+                # kubectl config current-context
+                # echo "K8sNamespace: $(K8sNamespace)"
+
+                # echo "kubectl get nodes -v=10"
+                # kubectl get nodes -v=10
+
+                # echo
+                # echo "kubectl config view --minify"
+                # kubectl config view --minify
+
+                # echo "kubectl describe"
+                # kubectl describe -n kube-system configmap/aws-auth
+                # echo
+                # echo "kubectl get svc"
+                # kubectl get svc
+
+                # echo
+                # echo  "kubectl cluster-info dump"
+                # kubectl cluster-info dump
+                # echo
+
+                # echo "kubectl cluster-info"
+                # kubectl cluster-info
+                # kubectl get clusterrolebindings
+                # echo ============================================================
+                # helm upgrade --install -f ./helm-chart/values.yaml azure-devops-test ./helm-chart/ --namespace azure-devops-test --create-namespace
+                # Sasha: remove this log ==========================
                 
                 # Deploy Helm Chart
                 echo 'Deploy Helm chart to EKS...'
